@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<!-- 扫描别名 -->
+	<typeAliases>
+		<package name="com.java.match.entity"/>
+	</typeAliases>
+	
+	<!-- 注册插件 -->
+	<plugins>
+		<plugin interceptor="com.java.match.plugin.PagePlugin" />
+	</plugins>
+	
+</configuration>

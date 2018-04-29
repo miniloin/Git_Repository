@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--通用映射文件-->
+<mapper namespace="com.java.match.dao.IBaseDao">
+
+    <!--添加操作-->
+    <insert id="insert">
+        insert into ${tableName}
+        <foreach collection="fields" item="field" open="(" close=")" separator=",">
+            ${field}
+        </foreach>
+        values
+        <foreach collection="values" item="value" open="(" close=")" separator=",">
+            #{value}
+        </foreach>
+    </insert>
+
+    <!--修改操作-->
+    <update id="update">
+        update ${tableName} SET
+        <foreach collection="fieldValues" item="fieldValue" separator="," index="i">
+            ${fieldNames.get(i)} = #{fieldValue}
+        </foreach>
+        where ${keyName} = #{keyValue}
+    </update>
+
+    <!--查询单条数据-->
+    <select id="queryOne" resultType="map">
+        select * from ${tableName} where ${key} = #{id}
+    </select>
+
+    <!--查询所有记录-->
+    <select id="queryAll" resultType="map">
+        select * from ${tableName}
+    </select>
+
+    <!--删除单条记录-->
+    <delete id="deleteById">
+        delete from ${tableName} where ${key} = #{id}
+    </delete>
+
+    <!--删除多条记录-->
+    <delete id="deleteByIds">
+        delete from ${tableName} where ${key} IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

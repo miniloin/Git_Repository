@@ -3,12 +3,16 @@ package com.java.match.entity;
 import com.java.match.annotation.IKey;
 import com.java.match.annotation.IParam;
 import com.java.match.annotation.ITable;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-@ITable("t_user")
-public class User implements Serializable {
+import java.util.Date;
+import java.util.List;
 
-    @IKey
+@ITable("t_user")
+public class User{
+
+    @IKey("id")
     private Integer id;
     @IParam("username")
     private String username ;
@@ -20,7 +24,7 @@ public class User implements Serializable {
     private Integer age;
     @IParam("email")
     private String email;
-    @IParam("")
+    @IParam("phone")
     private String phone;
     @IParam("isadmin")
     private int isadmin ;
@@ -28,22 +32,15 @@ public class User implements Serializable {
     private String area;
     @IParam("pic")
     private String pic;
+    @IParam("time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date time;
 
-    public User() {
-    }
+    //用户-角色（对多）
+    private List<Role> roles;
 
-    public User(Integer id, String username, String password, Integer sex, Integer age, String email, String phone, int isadmin, String area, String pic) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.sex = sex;
-        this.age = age;
-        this.email = email;
-        this.phone = phone;
-        this.isadmin = isadmin;
-        this.area = area;
-        this.pic = pic;
-    }
+    //选手-比赛项目（对多）
+    private List<MatchType> matchTypes;
 
     public Integer getId() {
         return id;
@@ -125,6 +122,30 @@ public class User implements Serializable {
         this.pic = pic;
     }
 
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    public List<MatchType> getMatchTypes() {
+        return matchTypes;
+    }
+
+    public void setMatchTypes(List<MatchType> matchTypes) {
+        this.matchTypes = matchTypes;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -138,6 +159,7 @@ public class User implements Serializable {
                 ", isadmin=" + isadmin +
                 ", area='" + area + '\'' +
                 ", pic='" + pic + '\'' +
+                ", time=" + time +
                 '}';
     }
 }

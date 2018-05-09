@@ -3,6 +3,83 @@
 
 <!-- 通用的映射文件 -->
 <mapper namespace="com.java.match.dao.IUserDao">
+    
+    <resultMap id="userMap" type="user">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="sex" property="sex" />
+        <result column="age" property="age" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="isadmin" property="isadmin" />
+        <result column="area" property="area" />
+        <result column="pic" property="pic" />
+        <result column="time" property="time" />
+
+        <!--对多-->
+        <collection property="roles" ofType="role">
+            <id column="rid" property="id" />
+            <result column="rname" property="rname" />
+            <result column="rcontext" property="rcontext" />
+            <result column="rrealise" property="rrealise" />
+        </collection>
+
+        <collection property="matchTypes" ofType="matchtype">
+            <id column="mid" property="id"/>
+            <result column="mpid" property="mpid" />
+            <result column="name" property="name"/>
+        </collection>
+        
+    </resultMap>
+
+    <select id="login" resultType="user">
+        select * from t_user where username = #{username} and password = #{password}
+    </select>
+
+    <select id="queryAllCase" resultMap="userMap">
+        SELECT u.*,r.id as rid,r.rname FROM t_user u
+        LEFT JOIN user_role ur ON ur.uid = u.id
+        LEFT JOIN t_role r ON r.id = ur.rid
+    </select>
+
+    <delete id="deleteById">
+        delete from t_user where id = #{id}
+    </delete>
+
+    <delete id="deleteRoleByUid">
+        DELETE FROM user_role WHERE uid = #{uid}
+    </delete>
+
+    <!-- 批量插入用户和角色的关联关系 -->
+    <insert id="addRole">
+        insert into user_role values
+        <foreach collection="rids" item="rid" separator=",">
+            (#{uid}, #{rid})
+        </foreach>
+    </insert>
+
+    <!--
+        将选手以前的关联删除
+    -->
+    <delete id="deleteMatypeByUid">
+        delete from user_match where uid = #{uid}
+    </delete>
+
+    <!--批量插入选手和比赛项目得关联关系-->
+    <insert id="addMatchtype">
+        insert into user_match VALUES
+        <foreach collection="matids" item="matid" separator=",">
+            (#{uid},#{matid})
+        </foreach>
+    </insert>
+
+    <select id="queryJoin" resultMap="userMap">
+        SELECT u.username,u.area,m.id as mid,m.name FROM t_user u
+        INNER JOIN user_match um ON u.id = um.uid
+        INNER JOIN t_matchtype m ON um.matid = m.id
+        WHERE u.id = ${uid}
+    </select>
 
 </mapper>
 

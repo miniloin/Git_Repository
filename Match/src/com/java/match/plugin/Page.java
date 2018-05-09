@@ -20,6 +20,8 @@ public class Page{
     //上一页、下一页需要访问的URL
     private String url;
 
+    private List<?> list;
+
     //分页导航的页码范围
     //首页 上一页 498 499 500 501 502 下一页 尾页
     private List<Integer> indexs;
@@ -72,6 +74,14 @@ public class Page{
 
     public void setIndexs(List<Integer> indexs) {
         this.indexs = indexs;
+    }
+
+    public List<?> getList() {
+        return list;
+    }
+
+    public void setList(List<?> list) {
+        this.list = list;
     }
 
     /**

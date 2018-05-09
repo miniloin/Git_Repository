@@ -111,10 +111,11 @@ public abstract class BaseServiceImpl<T> implements IBaseService<T> {
             IKey iKey = field.getAnnotation(IKey.class);
             if (iKey != null){
                 keyName = iKey.value();
-
+                System.out.println("keyName:" + keyName);
                 //获得属性值
                 try {
                     keyValue = field.get(t);
+                    System.out.println("keyValue:" + keyValue);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -125,10 +126,13 @@ public abstract class BaseServiceImpl<T> implements IBaseService<T> {
             if (iParam != null){
                 //获得字段名
                 String fieldName = iParam.value();
+                System.out.println("fieldName:" + fieldName);
                 //获得对应的字段值
                 Object fieldValue = null;
                 try {
                     fieldValue = field.get(t);
+                    System.out.println("fieldValue:" + fieldValue);
+                    System.out.println(fieldValue);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -190,7 +194,6 @@ public abstract class BaseServiceImpl<T> implements IBaseService<T> {
 
         return tList;
     }
-
 //=======================抽取的公共方法=========================
     /**
      * 获得实体类表名

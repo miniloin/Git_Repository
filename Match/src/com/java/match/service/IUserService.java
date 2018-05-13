@@ -20,4 +20,6 @@ public interface IUserService extends IBaseService<User> {
     List<Object> queryJoin(Integer id);
 
     int deleteByUId(Integer id);
+
+    User queryOneCase(Integer id);
 }

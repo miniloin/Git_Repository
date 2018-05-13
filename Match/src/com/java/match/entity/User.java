@@ -4,13 +4,16 @@ import com.java.match.annotation.IKey;
 import com.java.match.annotation.IParam;
 import com.java.match.annotation.ITable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 @ITable("t_user")
-public class User{
+public class User implements UserDetails{
 
     @IKey("id")
     private Integer id;
@@ -26,8 +29,6 @@ public class User{
     private String email;
     @IParam("phone")
     private String phone;
-    @IParam("isadmin")
-    private int isadmin ;
     @IParam("area")
     private String area;
     @IParam("pic")
@@ -35,12 +36,19 @@ public class User{
     @IParam("time")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date time;
+    @IParam("rid")
+    private Integer rid;
 
-    //用户-角色（对多）
-    private List<Role> roles;
+    //一个用户对应一个角色吧
+    private Role role;
+
+    List<Role> roles;
 
     //选手-比赛项目（对多）
     private List<MatchType> matchTypes;
+
+    //当前用户所对应的角色所拥有的权限
+    List<Privilege> privileges;
 
     public Integer getId() {
         return id;
@@ -98,14 +106,6 @@ public class User{
         this.phone = phone;
     }
 
-    public int getIsadmin() {
-        return isadmin;
-    }
-
-    public void setIsadmin(int isadmin) {
-        this.isadmin = isadmin;
-    }
-
     public String getArea() {
         return area;
     }
@@ -130,6 +130,22 @@ public class User{
         this.time = time;
     }
 
+    public List<MatchType> getMatchTypes() {
+        return matchTypes;
+    }
+
+    public void setMatchTypes(List<MatchType> matchTypes) {
+        this.matchTypes = matchTypes;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public List<Role> getRoles() {
         return roles;
     }
@@ -138,12 +154,20 @@ public class User{
         this.roles = roles;
     }
 
-    public List<MatchType> getMatchTypes() {
-        return matchTypes;
+    public Integer getRid() {
+        return rid;
     }
 
-    public void setMatchTypes(List<MatchType> matchTypes) {
-        this.matchTypes = matchTypes;
+    public void setRid(Integer rid) {
+        this.rid = rid;
+    }
+
+    public List<Privilege> getPrivileges() {
+        return privileges;
+    }
+
+    public void setPrivileges(List<Privilege> privileges) {
+        this.privileges = privileges;
     }
 
     @Override
@@ -156,10 +180,47 @@ public class User{
                 ", age=" + age +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-                ", isadmin=" + isadmin +
                 ", area='" + area + '\'' +
                 ", pic='" + pic + '\'' +
                 ", time=" + time +
+                ", rid=" + rid +
+                ", role=" + role +
+                ", matchTypes=" + matchTypes +
                 '}';
     }
+
+    /**
+     * UserDetails 提供的方法
+     * @return
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    /**
+     * 当用户发送请求时,权限校验框架会调用该方法,获取当前登录的用户有哪些角色
+     * Role实现接口GrantedAuthority
+     * @return 用户所拥有的角色
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
+
 }

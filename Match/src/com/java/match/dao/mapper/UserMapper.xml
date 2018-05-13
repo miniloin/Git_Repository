@@ -12,16 +12,18 @@
         <result column="age" property="age" />
         <result column="email" property="email" />
         <result column="phone" property="phone" />
-        <result column="isadmin" property="isadmin" />
         <result column="area" property="area" />
         <result column="pic" property="pic" />
         <result column="time" property="time" />
+        <result column="rid" property="rid" />
 
-        <!--对多-->
-        <collection property="roles" ofType="role">
-            <id column="rid" property="id" />
+        <association property="role" javaType="role">
             <result column="rname" property="rname" />
-            <result column="rcontext" property="rcontext" />
+        </association>
+
+        <collection property="roles" ofType="role">
+            <id column="rrid" property="id" />
+            <result column="rname" property="rname"/>
             <result column="rrealise" property="rrealise" />
         </collection>
 
@@ -30,6 +32,15 @@
             <result column="mpid" property="mpid" />
             <result column="name" property="name"/>
         </collection>
+
+        <!--权限-->
+        <collection property="privileges" ofType="privilege">
+            <id column="pid" property="id" />
+            <result column="ppid" property="pid" />
+            <result column="pname" property="pname" />
+            <result column="purl" property="purl" />
+            <result column="ptype" property="ptype"/>
+        </collection>
         
     </resultMap>
 
@@ -37,10 +48,25 @@
         select * from t_user where username = #{username} and password = #{password}
     </select>
 
+    <!--根据用户名登录-同时查出该用户拥有哪些角色-->
+    <select id="loginByUserName" resultMap="userMap">
+        SELECT * ,p.pid AS ppid
+        FROM t_user u
+        LEFT JOIN t_role r ON u.rid = r.id
+        LEFT JOIN role_privilege rp ON r.id = rp.rid
+        LEFT JOIN t_privilege p ON rp.pid = p.id
+        WHERE u.username = #{username}
+    </select>
+
     <select id="queryAllCase" resultMap="userMap">
-        SELECT u.*,r.id as rid,r.rname FROM t_user u
-        LEFT JOIN user_role ur ON ur.uid = u.id
-        LEFT JOIN t_role r ON r.id = ur.rid
+        SELECT u.*,r.rname FROM t_user u
+        INNER JOIN t_role r ON u.rid = r.id
+    </select>
+
+    <select id="queryOneCase" resultType="user">
+        SELECT u.*,r.rname FROM t_user u
+        INNER JOIN t_role r ON u.rid = r.id
+        WHERE u.id = #{id}
     </select>
 
     <delete id="deleteById">

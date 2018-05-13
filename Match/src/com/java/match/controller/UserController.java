@@ -21,8 +21,11 @@ public class UserController extends BaseController {
 
     @RequestMapping("/queryAll")
     public String queryAll(Page page,Model model){
-        List<User> users = userService.queryAll(page);
-        //List<User> users = userService.queryAllCase(page);
+        //List<User> users = userService.queryAll(page);
+        List<User> users = userService.queryAllCase(page);
+        for (User user:users){
+            System.out.println(user);
+        }
         model.addAttribute("users",users);
         model.addAttribute("page",page);
         return "user/list";
@@ -61,6 +64,14 @@ public class UserController extends BaseController {
     @ResponseBody
     public User queryOne(Integer id,User user){
         user = userService.queryOne(id);
+        return user;
+    }
+
+    @RequestMapping("/queryOneCase")
+    @ResponseBody
+    public User queryOneCase(Integer id,User user){
+        user = userService.queryOneCase(id);
+        System.out.println(user);
         return user;
     }
 

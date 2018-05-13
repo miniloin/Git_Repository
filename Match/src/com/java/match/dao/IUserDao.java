@@ -23,4 +23,8 @@ public interface IUserDao extends IBaseDao {
     int deleteRoleByUid(Integer uid);
 
     int deleteById(Integer id);
+
+    User queryOneCase(Integer id);
+
+    User loginByUserName(String username);
 }

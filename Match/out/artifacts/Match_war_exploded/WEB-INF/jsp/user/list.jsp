@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%--
   Created by IntelliJ IDEA.
   User: Administrator
@@ -11,11 +12,14 @@
 <head>
     <base href="${pageContext.request.contextPath}/resource/"/>
     <title>用户管理</title>
+    <link rel="stylesheet" href="plugins/layui/css/layui.css" media="all">
 
     <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" >
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
-    <script src="js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript"
+            src="js/jquery-1.8.3.min.js"></script>
     <script src="bootstrap/bootstrap.min.js"></script>
 
     <!-- dialog 弹出框 -->
@@ -30,6 +34,10 @@
     <link rel="stylesheet" href="widget/webuploader/webuploader.css"/>
     <script type="text/javascript" src="widget/webuploader/webuploader.min.js"></script>
 
+    <style>
+        #select_pic div:nth-child(2){width:100%!important;height:100%!important;}
+    </style>
+
     <script>
         //打开添加职工的弹出框
         function open_dialog(){
@@ -43,7 +51,10 @@
             $("#email").val("");
             $("#phone").val("");
             $("#area").val("");
-            $("#isadmin").val("");
+
+            //处理角色
+            $("#btn").val("请选择");
+            $("#rid").val("");
 
             //处理头像
             $("#header_img").attr("src", "img/icons/header.jpg");
@@ -60,8 +71,8 @@
 
         //弹出修改的对话框
         function show_update_Dialog(id) {
-            $.get("${pageContext.request.contextPath}/user/queryOne",{id:id},function (data) {
-
+            $.get("${pageContext.request.contextPath}/user/queryOneCase",{id:id},function (data) {
+                alert(data)
                 //回填修改数据
                 $("#id").val(data.id);
                 $("#username").val(data.username);
@@ -73,10 +84,12 @@
                 $("#email").val(data.email);
                 $("#phone").val(data.phone);
                 $("#area").val(data.area);
-                $(":radio[name='isadmin'][value='"+ data.isadmin + "']").attr("checked", true);
+
+                //处理角色
+                $("#rid").val(data.rid);
 
                 //处理头像
-                $("#header_img").attr("src", "${pageContext.request.contextPath}/user/img?fileName=" + data.pic);
+                $("#header_img").attr("src", "${pageContext.request.contextPath}/file/img/" + data.pic);
                 $("#header_hidden").val(data.pic);
 
                 //打开修改的弹出框
@@ -89,85 +102,134 @@
             },"json")
         }
 
+        /**
+         * 图片上传
+         * 初始化webuploader
+         */
+        $(function(){
+            // 初始化Web Uploader
+            var uploader = WebUploader.create({
+                // 选完文件后，是否自动上传。
+                auto: true,
+                // swf文件路径
+                swf: 'widget/webuploader/Uploader.swf',
+                // 文件接收服务端。
+                server: '${pageContext.request.contextPath}/file/imgUpload',
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: '#select_pic'
+            });
+
+            //webuploader的事件绑定
+            //uploader.on("事件的名称", function);
+
+            //图片添加进队列的事件回调
+            uploader.on( 'fileQueued', function( file ) {
+                alert(file)
+                //需要显示缩略图的img标签
+                var $img = $("#header_img");
+
+                // 创建缩略图
+                // 如果为非图片文件，可以不用调用此方法。
+                // thumbnailWidth x thumbnailHeight 为 100 x 100
+                uploader.makeThumb( file, function( error, src ) {
+                    if ( error ) {
+                        $img.replaceWith('<span>不能预览</span>');
+                        return;
+                    }
+
+                    $img.attr( 'src', src );
+                }, 100, 100 );
+            });
+
+            //上传成功！
+            uploader.on("uploadSuccess", function(file, response){
+                alert(response.filename)
+                var $img=$("#header");
+                $img.attr("src","${pageContext.request.contextPath}/file/img/"+response.filename);
+                $("#p_info").html("<font color='green'>上传成功</font>");
+                $("#header_hidden").val(response.filename);
+            });
+
+            //上传失败！
+            uploader.on("uploadError", function(file){
+                $("#p_info").html("<font color='red'>上传失败</font>");
+            });
+        })
 
         /**
          * 给用户选择角色
          */
-        function select_role(uid) {
-            //设置用户id
-            $("#uid").val(uid);
-
-            //ajax获取所有角色信息
+        function open_tree_dialog(){
+            //ajax
             $.ajax({
-                url:"${pageContext.request.contextPath}/role/queryRole",
+                url:"${pageContext.request.contextPath}/role/queryAllAjax",
                 type:"GET",
-                data:{uid:uid},
                 success:function(data){
-                    //简单的树形结构
+                    //alert(data)
+                    //开启简单json格式的模式
                     var setting = {
                         data: {
                             key:{
                                 name: "rname"
+                            },
+                            simpleData: {
+                                pIdKey: "id"
                             }
                         },
                         view:{
-                            showIcon:false
+                            showIcon:false  //是否显示节点的图标
                         },
-                        check:{
-                            enable:true
+                        callback:{
+                            onClick:function(event, treeid, treeNode){
+                                //改变button的内容
+                                $("#btn").val(treeNode.rname);
+                                //修改隐藏域的id
+                                $("#rid").val(treeNode.id);
+
+                                //关闭树形结构dialog
+                                $("#ztree_dialog_div").dialog("close");
+                            }
                         }
                     };
+
+                    //ztree需要的json
                     var zNodes = data;
-                    //初始化
-                    $.fn.zTree.init($("#ztree_role_div"), setting, zNodes);
 
+                    //初始化ztree
+                    var ztreeObject = $.fn.zTree.init($("#ztree_div"), setting, zNodes);
+                    ztreeObject.expandAll(true);
 
-                    //弹出选择角色的弹出框
-                    $("#role_dialog_div").dialog({
+                    //获得当前选中的部门
+                    var id = $("#btn").val();
+                    //获取属性id为指定值的部门节点对象
+                    var treeNode = ztreeObject.getNodeByParam("id", id);
+                    //选中这个部门
+                    ztreeObject.selectNode(treeNode, true);
+
+                    //弹出ztreediv
+                    $("#ztree_dialog_div").dialog({
                         width: 300,
                         height: 400,
-                        title: "选择角色",
+                        title: "选择",
                         modal: true
                     });
                 },
                 dataType:"json"
-            })
+            });
         }
 
-        //提交选择的角色
-        function submitRoles(){
-            //获取当前选择了哪些角色
-            var ztreeObj = $.fn.zTree.getZTreeObj("ztree_role_div");
-            //获得该树选择节点集合
-            var nodes = ztreeObj.getCheckedNodes(true);
-
-            //node -> <input value="rid"/>
-            var html = "";
-            for(var i = 0; i < nodes.length; i++){
-                html += "<input name='rid' type='hidden' value='" + nodes[i].id + "'/>";
-            }
-
-            $("#roleid_div").html(html);
-
-            //提交表单
-            $("#formid").submit();
-        }
     </script>
 </head>
 <body>
-<div class="row">
-    <div class="col-md-12">
-        <h1>用户管理</h1>
-    </div>
-</div>
+<blockquote class="layui-elem-quote layui-text">
+    用户管理
+</blockquote>
 
 <div class="row" style="margin-bottom: 20px">
     <div class="col-md-1 col-md-offset-8">
-        <button type="button" onclick="open_dialog();" class="btn btn-success">新增</button>
+        <button type="button" onclick="open_dialog();" class="layui-btn">新增用户</button>
     </div>
-    <%--<div class="col-md-1">
-        <button type="button" class="btn btn-danger">删除</button>
-    </div>--%>
 </div>
 
 <div class="row">
@@ -182,42 +244,35 @@
                 <td>年龄</td>
                 <td>邮箱</td>
                 <td>电话</td>
-                <td>身份</td>
+                <td>角色</td>
                 <td>单位</td>
                 <td>编辑</td>
             </tr>
             <c:forEach items="${users}" var="user">
                 <tr>
                     <td>${user.username}</td>
-                    <td><img src="img/pic1.jpg" style="height: 70px; width: 100px"></td>
+                    <td><img style="width: 90px; height: 100px;"
+                             src="${pageContext.request.contextPath}/file/img/${user.pic}" />
+                    </td>
                     <td>${user.password}</td>
                     <td>${user.sex == 1 ? '男' : '女'}</td>
                     <td>${user.age}</td>
                     <td>${user.email}</td>
                     <td>${user.phone}</td>
-                    <td><c:if test="${user.isadmin == 0}">
-                        管理员
-                        </c:if>
-                        <c:if test="${user.isadmin == 1}">
-                         普通用户
-                        </c:if>
-                    </td>
+                    <td>${user.role.rname}</td>
                     <td>${user.area}</td>
                     <td>
                         <!-- 修改 -->
-                        <a href="javascript:show_update_Dialog(${user.id});" title="Edit"><img
-                                src="img/icons/pencil.png" alt="Edit"/></a>
-
+                        <security:authorize url="/user/insert">
+                        <a href="javascript:show_update_Dialog(${user.id});" title="Edit">
+                            <i class="layui-icon">&#xe642;</i>修改</a>
+                        </security:authorize>
                         <!-- 删除 -->
-                        <a href="${pageContext.request.contextPath}/user/deleteById/${user.id}" title="Delete">
-                            <img
-                                    src="img/icons/cross.png" alt="Delete"/></a>
+                        <security:authorize url="/user/deleteById/*">
+                        <a href="${pageContext.request.contextPath}/user/deleteById/${user.id}" title="Delete" style="color: #FF5722">
+                            <i class="layui-icon">&#x1006;</i>删除</a>
+                        </security:authorize>
 
-                        <!-- 用户编辑角色 -->
-                        <a href="javascript:select_role(${user.id});" title="Edit Meta">
-                            <img
-                                    src="img/icons/hammer_screwdriver.png"
-                                    alt="Edit Meta"/></a>
                     </td>
                 </tr>
             </c:forEach>
@@ -245,10 +300,11 @@
 
                     <p>
                         <label>头像</label>
-                        <img id="header_img" style="width: 100px; height: 70px;" src="img/icons/header.jpg"/>
+                        <img id="header_img" style="width: 90px; height: 100px;"
+                             src="images/icons/header.jpg"/>
                     <div id="select_pic">上传头像</div><p id="p_info"></p>
                     <!-- 上传头像的文件名称 -->
-                    <input id="header_hidden" name="header" type="hidden"/>
+                    <input id="header_hidden" name="pic" type="hidden"/>
                     </p>
 
                     <p>
@@ -276,11 +332,9 @@
                                name="age"/>
                     </p>
                     <p>
-                        <label>身份</label>
-                        <input type="radio" name="isadmin" value="0" checked/>
-                        管理员
-                        <input type="radio" name="isadmin" value="1"/>
-                        普通用户
+                        <label>角色</label>
+                        <input id="btn" type="button" value="请选择" onclick="open_tree_dialog();"/>
+                        <input id="rid" name="rid" type="hidden" value=""/>
                     </p>
                     <p>
                         <label>注册时间</label><br>
@@ -307,7 +361,7 @@
                                 name="area"/>
                     </p>
                     <p>
-                        <input class="mybutton" type="submit" value="submit"/>
+                        <input class="layui-btn" type="submit" value="提交"/>
                     </p>
                 </fieldset>
                 <div class="clear"></div>
@@ -326,23 +380,6 @@
     </div>
 </div>
 
-<!-- 选择角色的弹出框 -->
-<div id="role_dialog_div" style="display:none;">
-    <div id="ztree_role_div" class="ztree">
-
-    </div>
-
-    <!-- 设置角色的表单 -->
-    <form id="formid" action="${pageContext.request.contextPath}/user/selectRole" method="post">
-        <!-- 需要设置用户id -->
-        <input name="uid" id="uid" type="hidden" value=""/>
-        <!-- 需要设置的角色的id集合 -->
-        <div id="roleid_div"></div>
-
-        <button type="button" onclick="submitRoles();" class="mybutton">设置角色</button>
-    </form>
-
-</div>
 
 </div>
 </div>

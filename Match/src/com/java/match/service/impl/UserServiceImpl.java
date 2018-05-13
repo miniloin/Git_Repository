@@ -2,10 +2,14 @@ package com.java.match.service.impl;
 
 import com.java.match.dao.IBaseDao;
 import com.java.match.dao.IUserDao;
+import com.java.match.entity.Role;
 import com.java.match.entity.User;
 import com.java.match.plugin.Page;
 import com.java.match.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +17,7 @@ import java.beans.Transient;
 import java.util.List;
 
 @Service
-public class UserServiceImpl extends BaseServiceImpl<User> implements IUserService {
+public class UserServiceImpl extends BaseServiceImpl<User> implements IUserService,UserDetailsService {
 
     @Autowired
     private IUserDao userDao;
@@ -72,5 +76,27 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
         return 1;
     }
 
+    @Override
+    public User queryOneCase(Integer id) {
+        return userDao.queryOneCase(id);
+    }
 
+
+    /**
+     *UserDetailsService提供的方法
+     * 每当用户登录时,security框架都会自动调用该方法,传入的参数就是用户输入的用户名
+     * 若登录失败不清楚是用户名错了还是密码错了
+     * 该接口有 String getPassword();方法,会与用户输入的密码匹配
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userDao.loginByUserName(username);
+        Role role = user.getRole();
+        String realise = role.getRrealise();//别名
+        System.out.println("所拥有的角色：" + realise);
+        return user;
+    }
 }

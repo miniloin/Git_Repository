@@ -22,4 +22,6 @@ public interface IUserService extends IBaseService<User> {
     int deleteByUId(Integer id);
 
     User queryOneCase(Integer id);
+
+    List<User> queryByUserName();
 }

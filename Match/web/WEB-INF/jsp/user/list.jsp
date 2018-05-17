@@ -45,6 +45,7 @@
             $("#id").val("");
             $("#username").val("");
             $("#password").val("");
+            $("#name").val("");
             $(":radio[name='esex'][value='1']").attr("checked", true);
             $("#age").val("");
             $("#time").val("");
@@ -77,6 +78,7 @@
                 $("#id").val(data.id);
                 $("#username").val(data.username);
                 $("#password").val(data.password);
+                $("#name").val(data.name);
                 $(":radio[name='sex'][value='"+ data.sex + "']").attr("checked", true);
                 $("#age").val(data.age);
                 var time = $.datepicker.formatDate("yy-mm-dd",new Date(data.time));
@@ -239,6 +241,7 @@
 
                 <td>用户名</td>
                 <td>头像</td>
+                <td>姓名</td>
                 <td>密码</td>
                 <td>性别</td>
                 <td>年龄</td>
@@ -254,6 +257,7 @@
                     <td><img style="width: 90px; height: 100px;"
                              src="${pageContext.request.contextPath}/file/img/${user.pic}" />
                     </td>
+                    <td>${user.name}</td>
                     <td>${user.password}</td>
                     <td>${user.sex == 1 ? '男' : '女'}</td>
                     <td>${user.age}</td>
@@ -312,6 +316,12 @@
                         <input
                                 class="text-input small-input" type="text" id="username"
                                 name="username"/>
+                    </p>
+                    <p>
+                        <label>姓名</label><br>
+                        <input
+                                class="text-input small-input" type="text" id="name"
+                                name="name"/>
                     </p>
                     <p>
                         <label>密码</label><br>

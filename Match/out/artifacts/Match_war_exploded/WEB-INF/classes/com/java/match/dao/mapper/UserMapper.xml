@@ -8,6 +8,7 @@
         <id column="id" property="id" />
         <result column="username" property="username" />
         <result column="password" property="password" />
+        <result column="name" property="name"/>
         <result column="sex" property="sex" />
         <result column="age" property="age" />
         <result column="email" property="email" />
@@ -105,6 +106,10 @@
         INNER JOIN user_match um ON u.id = um.uid
         INNER JOIN t_matchtype m ON um.matid = m.id
         WHERE u.id = ${uid}
+    </select>
+
+    <select id="queryByUserName" resultMap="userMap">
+        select username from t_user
     </select>
 
 </mapper>

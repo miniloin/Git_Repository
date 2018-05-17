@@ -1,7 +1,5 @@
 package com.java.match.dao;
 
-import com.java.match.annotation.IParam;
-import com.java.match.annotation.ITable;
 import com.java.match.plugin.Page;
 import org.apache.ibatis.annotations.Param;
 
@@ -56,6 +54,5 @@ public interface IBaseDao {
      * update tableName set field = value where name= ?
      */
     int update(@Param("tableName") String tableName,@Param("keyName") String keyName,@Param("keyValue") Object keyValue,@Param("fieldNames") List<String> fieldNames,@Param("fieldValues") List<?> fieldValues);
-
 
 }

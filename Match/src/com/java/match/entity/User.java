@@ -21,6 +21,8 @@ public class User implements UserDetails{
     private String username ;
     @IParam("password")
     private String password;
+    @IParam("name")
+    private String name;
     @IParam("sex")
     private Integer sex;
     @IParam("age")
@@ -72,6 +74,14 @@ public class User implements UserDetails{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getSex() {
@@ -176,6 +186,7 @@ public class User implements UserDetails{
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
                 ", sex=" + sex +
                 ", age=" + age +
                 ", email='" + email + '\'' +
@@ -185,7 +196,9 @@ public class User implements UserDetails{
                 ", time=" + time +
                 ", rid=" + rid +
                 ", role=" + role +
+                ", roles=" + roles +
                 ", matchTypes=" + matchTypes +
+                ", privileges=" + privileges +
                 '}';
     }
 

@@ -27,4 +27,7 @@ public interface IUserDao extends IBaseDao {
     User queryOneCase(Integer id);
 
     User loginByUserName(String username);
+
+    List<User> queryByUserName();
+
 }

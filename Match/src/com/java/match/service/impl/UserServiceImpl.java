@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.util.List;
 
 @Service
@@ -79,6 +78,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
     @Override
     public User queryOneCase(Integer id) {
         return userDao.queryOneCase(id);
+    }
+
+    @Override
+    public List<User> queryByUserName() {
+        return userDao.queryByUserName();
     }
 
 

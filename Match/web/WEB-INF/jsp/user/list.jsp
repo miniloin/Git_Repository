@@ -54,7 +54,7 @@
             $("#area").val("");
 
             //处理角色
-            $("#btn").val("请选择");
+            $("#btn").val("请选择角色");
             $("#rid").val("");
 
             //处理头像
@@ -65,7 +65,7 @@
             $("#dialog_div").dialog({
                 width:600,
                 height:500,
-                title:"添加",
+                title:"新增用户",
                 modal:true
             });
         }
@@ -73,7 +73,7 @@
         //弹出修改的对话框
         function show_update_Dialog(id) {
             $.get("${pageContext.request.contextPath}/user/queryOneCase",{id:id},function (data) {
-                alert(data)
+                //alert(data)
                 //回填修改数据
                 $("#id").val(data.id);
                 $("#username").val(data.username);
@@ -98,7 +98,7 @@
                 $("#dialog_div").dialog({
                     width:600,
                     height:500,
-                    title:"修改",
+                    title:"修改用户信息",
                     modal:true
                 });
             },"json")
@@ -146,7 +146,7 @@
 
             //上传成功！
             uploader.on("uploadSuccess", function(file, response){
-                alert(response.filename)
+                //alert(response.filename)
                 var $img=$("#header");
                 $img.attr("src","${pageContext.request.contextPath}/file/img/"+response.filename);
                 $("#p_info").html("<font color='green'>上传成功</font>");
@@ -213,7 +213,7 @@
                     $("#ztree_dialog_div").dialog({
                         width: 300,
                         height: 400,
-                        title: "选择",
+                        title: "选择角色",
                         modal: true
                     });
                 },
@@ -225,7 +225,7 @@
 </head>
 <body>
 <blockquote class="layui-elem-quote layui-text">
-    用户管理
+    所有用户信息
 </blockquote>
 
 <div class="row" style="margin-bottom: 20px">
@@ -234,22 +234,22 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row" style="margin-left: 8px;margin-right: 8px">
     <div class="col-md-12">
         <table class="table table-bordered table-hover">
             <tr>
 
-                <td>用户名</td>
-                <td>头像</td>
-                <td>姓名</td>
-                <td>密码</td>
-                <td>性别</td>
-                <td>年龄</td>
-                <td>邮箱</td>
-                <td>电话</td>
-                <td>角色</td>
-                <td>单位</td>
-                <td>编辑</td>
+                <th>用户名</th>
+                <th>头像</th>
+                <th>姓名</th>
+                <th>密码</th>
+                <th>性别</th>
+                <th>年龄</th>
+                <th>邮箱</th>
+                <th>电话</th>
+                <th>角色</th>
+                <th>单位</th>
+                <th>编辑</th>
             </tr>
             <c:forEach items="${users}" var="user">
                 <tr>
@@ -301,78 +301,88 @@
                     <p>
                         <input type="hidden" id="id" name="id" value="" />
                     </p>
+<div style="width: 100%;overflow: hidden">
 
-                    <p>
-                        <label>头像</label>
-                        <img id="header_img" style="width: 90px; height: 100px;"
-                             src="images/icons/header.jpg"/>
-                    <div id="select_pic">上传头像</div><p id="p_info"></p>
-                    <!-- 上传头像的文件名称 -->
-                    <input id="header_hidden" name="pic" type="hidden"/>
-                    </p>
+    <div style="float: left">
+        <p>
 
-                    <p>
-                        <label>用户名</label><br>
-                        <input
-                                class="text-input small-input" type="text" id="username"
-                                name="username"/>
-                    </p>
-                    <p>
-                        <label>姓名</label><br>
-                        <input
-                                class="text-input small-input" type="text" id="name"
-                                name="name"/>
-                    </p>
-                    <p>
-                        <label>密码</label><br>
-                        <input
-                                class="text-input small-input" type="text" id="password"
-                                name="password"/>
-                    </p>
-                    <p>
-                        <label>性别</label>
-                        <input type="radio" name="sex" value="1" checked/>
-                        男
-                        <input type="radio" name="sex" value="0"/>
-                        女
-                    </p>
-                    <p>
-                        <label>年龄</label><br>
-                        <input class="text-input small-input" type="text" id="age"
-                               name="age"/>
-                    </p>
-                    <p>
-                        <label>角色</label>
-                        <input id="btn" type="button" value="请选择" onclick="open_tree_dialog();"/>
-                        <input id="rid" name="rid" type="hidden" value=""/>
-                    </p>
-                    <p>
-                        <label>注册时间</label><br>
-                        <input class="text-input small-input" type="date" id="time"
-                               name="time"/>
-                    </p>
+            <img id="header_img" style="width: 100px; height: 100px;"
+                 src="images/icons/header.jpg"/>
+        <div id="select_pic">
+            <i class="layui-icon">&#xe67c;</i>上传头像</div>
+        <p id="p_info"></p>
+        <!-- 上传头像的文件名称 -->
+        <input id="header_hidden" name="pic" type="hidden"/>
+        </p>
+    </div>
 
-                    <p>
-                        <label>邮箱</label><br>
-                        <input
-                                class="text-input small-input" type="text" id="email"
-                                name="email"/>
-                    </p>
-                    <p>
-                        <label>联系方式</label><br>
-                        <input
-                                class="text-input small-input" type="text" id="phone"
-                                name="phone"/>
-                    </p>
-                    <p>
-                        <label>单位</label><br>
-                        <input
-                                class="text-input small-input" type="text" id="area"
-                                name="area"/>
-                    </p>
+    <div style="float: left;margin-left: 50px">
+        <p>
+            <label>用户名</label><br>
+            <input
+                    class="text-input small-input" type="text" id="username"
+                    name="username"/>
+        </p>
+        <p>
+            <label>姓名</label><br>
+            <input
+                    class="text-input small-input" type="text" id="name"
+                    name="name"/>
+        </p>
+        <p>
+            <label>密码</label><br>
+            <input
+                    class="text-input small-input" type="text" id="password"
+                    name="password"/>
+        </p>
+        <p>
+            <label>性别</label>
+            <input type="radio" name="sex" value="1" checked/>
+            男
+            <input type="radio" name="sex" value="0"/>
+            女
+        </p>
+        <p>
+            <label>年龄</label><br>
+            <input class="text-input small-input" type="text" id="age"
+                   name="age"/>
+        </p>
+        <p>
+
+            <input id="btn" class="layui-btn" type="button" value="请选择角色" onclick="open_tree_dialog();"/>
+            <input id="rid" name="rid" type="hidden" value=""/>
+        </p>
+        <p>
+            <label>注册时间</label><br>
+            <input class="text-input small-input" type="date" id="time"
+                   name="time"/>
+        </p>
+
+        <p>
+            <label>邮箱</label><br>
+            <input
+                    class="text-input small-input" type="text" id="email"
+                    name="email"/>
+        </p>
+        <p>
+            <label>联系方式</label><br>
+            <input
+                    class="text-input small-input" type="text" id="phone"
+                    name="phone"/>
+        </p>
+        <p>
+            <label>单位</label><br>
+            <input
+                    class="text-input small-input" type="text" id="area"
+                    name="area"/>
+        </p>
+    </div>
+</div>
+                    <div style="display: flex;justify-content: center">
                     <p>
                         <input class="layui-btn" type="submit" value="提交"/>
                     </p>
+                    </div>
                 </fieldset>
                 <div class="clear"></div>
                 <!-- End .clear -->

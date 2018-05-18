@@ -24,5 +24,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="commons-fileupload-1.2.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Tomcat 7.0.57" level="application_server_libraries" />
+    <orderEntry type="library" name="poi-3.10-FINAL-20140208" level="project" />
   </component>
 </module>
